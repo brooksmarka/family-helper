@@ -1,21 +1,44 @@
 import "./App.css";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useReducer } from "react";
+
+import awsConfig from "./aws-exports";
 import { Amplify } from "aws-amplify";
 import { generateClient } from "aws-amplify/api";
-import awsConfig from "./aws-exports";
-import { Authenticator, signOut } from "@aws-amplify/ui-react";
+import { Authenticator } from "@aws-amplify/ui-react";
+
 import { listLists } from "./graphql/queries";
-import "semantic-ui-css/semantic.min.css";
+import { createList } from "./graphql/mutations";
+
 import MainHeader from "./components/headers/MainHeader";
 import Lists from "./components/Lists/Lists";
-import "@aws-amplify/ui-react/styles.css";
+
 import { Container, Button, Icon, Modal, Form } from "semantic-ui-react";
+import "@aws-amplify/ui-react/styles.css";
+import "semantic-ui-css/semantic.min.css";
 
 Amplify.configure(awsConfig);
+
+const initialState = {
+  title: "",
+  description: "",
+};
+
+function listReducer(state = initialState, action) {
+  switch (action.type) {
+    case "DESCRIPTION_CHANGED":
+      return { ...state, description: action.value };
+    case "TITLE_CHANGED":
+      return { ...state, title: action.value };
+    default:
+      console.log("Default action for: ", action);
+      return state;
+  }
+}
 
 const client = generateClient();
 
 export default function App() {
+  const [state, dispatch] = useReducer(listReducer, initialState);
   const [lists, setLists] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -35,6 +58,20 @@ export default function App() {
 
   function toggleModal(shouldOpen) {
     setIsModalOpen(shouldOpen);
+  }
+
+  async function saveList() {
+    try {
+      const { title, description } = state;
+      const result = await client.graphql({
+        query: createList,
+        variables: { input: { title, description } },
+      });
+      toggleModal(false);
+      console.log("result", result);
+    } catch (e) {
+      console.log("here is the error", e);
+    }
   }
 
   return (
@@ -66,10 +103,24 @@ export default function App() {
                   }
                   label='Title'
                   placeholder='My amazing list'
+                  value={state.title}
+                  onChange={(e) =>
+                    dispatch({
+                      type: "TITLE_CHANGED",
+                      value: e.target.value,
+                    })
+                  }
                 ></Form.Input>
                 <Form.TextArea
+                  value={state.description}
                   label='Description'
-                  placeholder='Things that my pretty list is about'
+                  placeholder='Things that my list is about'
+                  onChange={(e) =>
+                    dispatch({
+                      type: "DESCRIPTION_CHANGED",
+                      value: e.target.value,
+                    })
+                  }
                 ></Form.TextArea>
               </Form>
             </Modal.Content>
@@ -77,7 +128,7 @@ export default function App() {
               <Button negative onClick={() => toggleModal(false)}>
                 Cancel
               </Button>
-              <Button positive onClick={() => toggleModal(false)}>
+              <Button positive onClick={() => saveList()}>
                 Save
               </Button>
             </Modal.Actions>
