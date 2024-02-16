@@ -1,4 +1,5 @@
 import "./App.css";
+import React from 'react';
 import { useEffect, useState, useReducer } from "react";
 
 import awsConfig from "./aws-exports";
@@ -8,6 +9,7 @@ import { Authenticator } from "@aws-amplify/ui-react";
 
 import { listLists } from "./graphql/queries";
 import { createList } from "./graphql/mutations";
+import { onCreateList } from "./graphql/subscriptions";
 
 import MainHeader from "./components/headers/MainHeader";
 import Lists from "./components/Lists/Lists";
@@ -16,14 +18,16 @@ import { Container, Button, Icon, Modal, Form } from "semantic-ui-react";
 import "@aws-amplify/ui-react/styles.css";
 import "semantic-ui-css/semantic.min.css";
 
+import {State, Action, ListResponse } from './types';
+
 Amplify.configure(awsConfig);
 
-const initialState = {
+const initialState: State = {
   title: "",
   description: "",
 };
 
-function listReducer(state = initialState, action) {
+function listReducer(state: State = initialState, action: Action): State {
   switch (action.type) {
     case "DESCRIPTION_CHANGED":
       return { ...state, description: action.value };
@@ -37,23 +41,46 @@ function listReducer(state = initialState, action) {
 
 const client = generateClient();
 
-export default function App() {
+function App() {
   const [state, dispatch] = useReducer(listReducer, initialState);
+  const [newList, setNewList] = useState("");
   const [lists, setLists] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   async function fetchList() {
     try {
-      const { data } = await client.graphql({ query: listLists });
-      setLists(data.listLists.items);
-      console.log("data", data);
+      const response = await client.graphql<ListResponse>({ query: listLists }) as { data: ListResponse};
+      const { data } = response;
+      if (data?.listLists?.items){
+        setLists(data.listLists.items);
+        console.log("data", data);
+      }
     } catch (error) {
       console.error("Error fetching list:", error);
     }
   }
 
   useEffect(() => {
+    console.log("happening twice?");
     fetchList();
+  }, []);
+
+  useEffect(() => {
+    if (newList !== "") {
+      setLists([newList, ...lists]);
+    }
+  }, [newList]);
+
+  function addToList(data) {
+    console.log("data here maybe not though!!!", data);
+    setNewList(data.onCreateList);
+  }
+
+  useEffect(() => {
+    let subscription = client.graphql({ query: onCreateList }).subscribe({
+      next: ({ data }) => addToList(data),
+      error: (error) => console.warn(error),
+    });
   }, []);
 
   function toggleModal(shouldOpen) {
@@ -138,3 +165,5 @@ export default function App() {
     </Authenticator>
   );
 }
+
+export default App;
