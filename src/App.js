@@ -3,11 +3,12 @@ import { useEffect, useState, useReducer } from "react";
 
 import awsConfig from "./aws-exports";
 import { Amplify } from "aws-amplify";
-import { generateClient } from "aws-amplify/api";
 import { Authenticator } from "@aws-amplify/ui-react";
 
+import { generateClient } from "aws-amplify/api";
 import { listLists } from "./graphql/queries";
 import { createList } from "./graphql/mutations";
+import { onCreateList } from "./graphql/subscriptions";
 
 import MainHeader from "./components/headers/MainHeader";
 import Lists from "./components/Lists/Lists";
@@ -40,6 +41,7 @@ const client = generateClient();
 export default function App() {
   const [state, dispatch] = useReducer(listReducer, initialState);
   const [lists, setLists] = useState([]);
+  const [newList, setNewList] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   async function fetchList() {
@@ -54,6 +56,23 @@ export default function App() {
 
   useEffect(() => {
     fetchList();
+  }, []);
+
+  useEffect(() => {
+    if (newList !== "") {
+      setLists([newList, ...lists]);
+    }
+  }, [newList]);
+
+  function addToList(data) {
+    setNewList(data.onCreateList);
+  }
+
+  useEffect(() => {
+    let subscription = client.graphql({ query: onCreateList }).subscribe({
+      next: ({ data }) => addToList(data),
+      error: (error) => console.log(error),
+    });
   }, []);
 
   function toggleModal(shouldOpen) {
