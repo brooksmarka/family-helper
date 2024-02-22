@@ -32,6 +32,10 @@
   color: var(--amplify-secondary-contrast)
 }
 
+.ml-3 {
+  margin-left: 3em !important;
+}
+
 .ui.button.floatingButton:hover {
   background-color: var(--amplify-primary-color)
 }
