@@ -11,9 +11,10 @@ import { createList, deleteList } from "./graphql/mutations";
 import { onCreateList, onDeleteList } from "./graphql/subscriptions";
 
 import MainHeader from "./components/headers/MainHeader";
-import Lists from "./components/Lists/Lists";
+import Lists from "./components/lists/Lists";
+import ListModal from "./components/modals/ListModal";
 
-import { Container, Button, Icon, Modal, Form } from "semantic-ui-react";
+import { Container, Button, Icon } from "semantic-ui-react";
 import "@aws-amplify/ui-react/styles.css";
 import "semantic-ui-css/semantic.min.css";
 
@@ -24,6 +25,7 @@ const initialState = {
   description: "",
   lists: [],
   isModalOpen: false,
+  modalType: "",
 };
 
 function listReducer(state = initialState, action) {
@@ -44,8 +46,21 @@ function listReducer(state = initialState, action) {
         ...state,
         lists: state.lists.filter((list) => list.id !== action.value),
       };
+    case "EDIT_LIST":
+      console.log("here is action", action);
+      const newValue = { ...action.value };
+      delete newValue.children;
+      delete newValue.dispatch;
+      delete newValue.listItems;
+      return {
+        ...state,
+        isModalOpen: true,
+        modalType: "edit",
+        description: newValue.description,
+        title: newValue.title,
+      };
     case "OPEN_MODAL":
-      return { ...state, isModalOpen: true };
+      return { ...state, isModalOpen: true, modalType: "add" };
     case "CLOSE_MODAL":
       return { ...state, isModalOpen: false, title: "", description: "" };
     default:
@@ -113,6 +128,19 @@ export default function App() {
     }
   }
 
+  async function editList() {
+    try {
+      const { title, description } = state;
+      const result = await client.graphql({
+        query: createList,
+        variables: { input: { title, description } },
+      });
+      dispatch({ type: "CLOSE_MODAL" });
+    } catch (e) {
+      console.log("here is the error", e);
+    }
+  }
+
   return (
     <Authenticator>
       {({ signOut, user }) => (
@@ -132,49 +160,12 @@ export default function App() {
               <Lists lists={state.lists} dispatch={dispatch} />
             </div>
           </Container>
-          <Modal open={state.isModalOpen} dimmer='inverted'>
-            <Modal.Header>Create Your List</Modal.Header>
-            <Modal.Content>
-              <Form>
-                <Form.Input
-                  error={
-                    true ? false : { content: "Please add a name to your list" }
-                  }
-                  label='Title'
-                  placeholder='My amazing list'
-                  value={state.title}
-                  onChange={(e) =>
-                    dispatch({
-                      type: "TITLE_CHANGED",
-                      value: e.target.value,
-                    })
-                  }
-                ></Form.Input>
-                <Form.TextArea
-                  value={state.description}
-                  label='Description'
-                  placeholder='Things that my list is about'
-                  onChange={(e) =>
-                    dispatch({
-                      type: "DESCRIPTION_CHANGED",
-                      value: e.target.value,
-                    })
-                  }
-                ></Form.TextArea>
-              </Form>
-            </Modal.Content>
-            <Modal.Actions>
-              <Button
-                negative
-                onClick={() => dispatch({ type: "CLOSE_MODAL" })}
-              >
-                Cancel
-              </Button>
-              <Button positive onClick={() => saveList()}>
-                Save
-              </Button>
-            </Modal.Actions>
-          </Modal>
+          <ListModal
+            state={state}
+            dispatch={dispatch}
+            saveList={saveList}
+            editList={editList}
+          />
         </div>
       )}
     </Authenticator>
