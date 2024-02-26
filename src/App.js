@@ -11,7 +11,7 @@ import { createList, deleteList } from "./graphql/mutations";
 import { onCreateList, onDeleteList } from "./graphql/subscriptions";
 
 import MainHeader from "./components/headers/MainHeader";
-import Lists from "./components/lists/Lists";
+import Lists from "./components/Lists/Lists";
 import ListModal from "./components/modals/ListModal";
 
 import { Container, Button, Icon } from "semantic-ui-react";
