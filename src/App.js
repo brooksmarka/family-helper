@@ -7,8 +7,8 @@ import { Authenticator } from "@aws-amplify/ui-react";
 
 import { generateClient } from "aws-amplify/api";
 import { listLists } from "./graphql/queries";
-import { createList, deleteList } from "./graphql/mutations";
-import { onCreateList, onDeleteList } from "./graphql/subscriptions";
+import { deleteList } from "./graphql/mutations";
+import { onCreateList, onDeleteList, onUpdateList } from "./graphql/subscriptions";
 
 import MainHeader from "./components/headers/MainHeader";
 import Lists from "./components/Lists/Lists";
@@ -21,6 +21,7 @@ import "semantic-ui-css/semantic.min.css";
 Amplify.configure(awsConfig);
 
 const initialState = {
+  id: "",
   title: "",
   description: "",
   lists: [],
@@ -29,6 +30,7 @@ const initialState = {
 };
 
 function listReducer(state = initialState, action) {
+  let newList;
   switch (action.type) {
     case "DESCRIPTION_CHANGED":
       return { ...state, description: action.value };
@@ -42,10 +44,19 @@ function listReducer(state = initialState, action) {
         ...state,
       };
     case "DELETE_LIST_RESULT":
-      return {
+    newList = state.lists.filter((list) => list.id !== action.value)  
+    return {
         ...state,
-        lists: state.lists.filter((list) => list.id !== action.value),
+        lists: newList,
       };
+    case "UPDATE_LIST_RESULT":
+      const index = state.lists.findIndex(
+        item => item.id === action.value.id
+      );
+      newList = [...state.lists];
+      delete action.value.listItems;
+      newList[index] = action.value;
+      return {...state, lists: newList };
     case "EDIT_LIST":
       console.log("here is action", action);
       const newValue = { ...action.value };
@@ -56,13 +67,14 @@ function listReducer(state = initialState, action) {
         ...state,
         isModalOpen: true,
         modalType: "edit",
+        id: newValue.id,
         description: newValue.description,
         title: newValue.title,
       };
     case "OPEN_MODAL":
       return { ...state, isModalOpen: true, modalType: "add" };
     case "CLOSE_MODAL":
-      return { ...state, isModalOpen: false, title: "", description: "" };
+      return { ...state, isModalOpen: false, title: "", description: "", id: "" };
     default:
       console.log("Default action for: ", action);
       return state;
@@ -96,13 +108,21 @@ export default function App() {
   }, []);
 
   useEffect(() => {
-    let createListSub = client.graphql({ query: onCreateList }).subscribe({
+    const createListSub = client.graphql({ query: onCreateList }).subscribe({
       next: ({ data }) => {
+        console.log("onCreateList called");
         dispatch({ type: "UPDATE_LISTS", value: [data.onCreateList] });
       },
       error: (error) => console.log(error),
     });
-    let deleteListSub = client.graphql({ query: onDeleteList }).subscribe({
+    const updateListSub = client.graphql({ query: onUpdateList }).subscribe({
+      next: ({data}) => {
+        console.log("onUpdateeList called", data);
+        dispatch({ type: "UPDATE_LIST_RESULT",
+        value: data.onUpdateList });
+      }
+    })
+    const deleteListSub = client.graphql({ query: onDeleteList }).subscribe({
       next: ({ data }) => {
         dispatch({ type: "DELETE_LIST_RESULT", value: data.onDeleteList.id });
       },
@@ -112,34 +132,9 @@ export default function App() {
     return () => {
       deleteListSub.unsubscribe();
       createListSub.unsubscribe();
+      updateListSub.unsubscribe();
     };
   }, []);
-
-  async function saveList() {
-    try {
-      const { title, description } = state;
-      const result = await client.graphql({
-        query: createList,
-        variables: { input: { title, description } },
-      });
-      dispatch({ type: "CLOSE_MODAL" });
-    } catch (e) {
-      console.log("here is the error", e);
-    }
-  }
-
-  async function editList() {
-    try {
-      const { title, description } = state;
-      const result = await client.graphql({
-        query: createList,
-        variables: { input: { title, description } },
-      });
-      dispatch({ type: "CLOSE_MODAL" });
-    } catch (e) {
-      console.log("here is the error", e);
-    }
-  }
 
   return (
     <Authenticator>
@@ -163,8 +158,6 @@ export default function App() {
           <ListModal
             state={state}
             dispatch={dispatch}
-            saveList={saveList}
-            editList={editList}
           />
         </div>
       )}

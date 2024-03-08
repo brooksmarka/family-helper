@@ -1,7 +1,39 @@
 import React from "react";
 import { Button, Modal, Form } from "semantic-ui-react";
 
-function ListModal({ state, dispatch, saveList, editList }) {
+import { generateClient } from "aws-amplify/api";
+import { createList, updateList } from "../../graphql/mutations";
+const client = generateClient();
+
+function ListModal({ state, dispatch}) {
+
+  async function saveList() {
+    try {
+      const { title, description } = state;
+      const result = await client.graphql({
+        query: createList,
+        variables: { input: { title, description } },
+      });
+      dispatch({ type: "CLOSE_MODAL" });
+    } catch (e) {
+      console.log("here is the error", e);
+    }
+  }
+
+  async function changeList() {
+    try {
+      const { id, title, description } = state;
+      const result = await client.graphql({
+        query: updateList,
+        variables: { input: {id, title, description } },
+      });
+      dispatch({ type: "CLOSE_MODAL" });
+      console.log("Edit data with result", result)
+    } catch (e) {
+      console.log("here is the error", e);
+    }
+  }
+
   return (
     <Modal open={state.isModalOpen} dimmer='inverted'>
       <Modal.Header>
@@ -42,7 +74,7 @@ function ListModal({ state, dispatch, saveList, editList }) {
         <Button
           positive
           onClick={() => {
-            state.modalType === "add" ? saveList() : saveList();
+            state.modalType === "add" ? saveList() : changeList();
           }}
         >
           {state.modalType === "add" ? "Save" : "Update"}
