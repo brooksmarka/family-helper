@@ -2,7 +2,7 @@ import "./App.css";
 import { useEffect, useReducer } from "react";
 
 import awsConfig from "./aws-exports";
-import { Amplify } from "aws-amplify";
+import { Amplify, } from "aws-amplify";
 import { Authenticator } from "@aws-amplify/ui-react";
 
 import { generateClient } from "aws-amplify/api";
@@ -13,6 +13,7 @@ import { onCreateList, onDeleteList, onUpdateList } from "./graphql/subscription
 import MainHeader from "./components/headers/MainHeader";
 import Lists from "./components/Lists/Lists";
 import ListModal from "./components/modals/ListModal";
+import UploadImage from "./components/HandleImages/UploadImage";
 
 import { Container, Button, Icon } from "semantic-ui-react";
 import "@aws-amplify/ui-react/styles.css";
@@ -84,7 +85,7 @@ function listReducer(state = initialState, action) {
 const client = generateClient();
 
 async function deleteListById(id) {
-  const result = await client.graphql({
+  await client.graphql({
     query: deleteList,
     variables: { input: { id } },
   });
@@ -154,6 +155,7 @@ export default function App() {
               <MainHeader />
               <Lists lists={state.lists} dispatch={dispatch} />
             </div>
+            <UploadImage />
           </Container>
           <ListModal
             state={state}

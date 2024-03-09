@@ -1,0 +1,16 @@
+{
+  "resourceName": "familyHelperBucket",
+  "policyUUID": "2f5665e0",
+  "bucketName": "familyhelpere088685747f14f5f8aa18afda217f23c",
+  "storageAccess": "authAndGuest",
+  "guestAccess": [
+    "READ"
+  ],
+  "authAccess": [
+    "CREATE_AND_UPDATE",
+    "READ",
+    "DELETE"
+  ],
+  "triggerFunction": "NONE",
+  "groupAccess": {}
+}

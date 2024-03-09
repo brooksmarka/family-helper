@@ -17,6 +17,9 @@
       },
       "api": {
         "familyhelper": {}
+      },
+      "storage": {
+        "familyHelperBucket": {}
       }
     }
   }
