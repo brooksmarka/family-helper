@@ -1,47 +1,22 @@
-import React, { useRef, useState, useEffect} from 'react';
+import React, { useRef, useState } from 'react';
 import { Image, Button, Header} from 'semantic-ui-react'
-import { uploadData } from  '@aws-amplify/storage';
 
-function UploadImage() {
-    const inputRef = useRef();
+
+function UploadImage({getSelectedFile}) {
+  const inputRef = useRef();
 
   const [image, setImage] = useState(
     'https://react.semantic-ui.com/images/wireframe/image.png'
   );
-  const [fileName, setFileName] = useState();
 
   function handleInputChange(e){
     const fileToUpload = e.target.files[0];
     if(!fileToUpload) return;
     const fileSampleUrl = URL.createObjectURL(fileToUpload);
     setImage(fileSampleUrl);
-    setFileName(fileToUpload);
-  };
-    useEffect(() => {
-      const uploadImage = async () => {
-        if(!fileName) return
-        const [file, extension] = fileName.name.split(".");
-        const mimeType = fileName.type;
-        const key = `images/lists/${file}.${extension}`;
-        try {
-          const result = await uploadData({
-            key,
-            data: fileName,
-            options: {
-              accessLevel: 'guest',
-              contentType: mimeType,
-              metadata: {
-                app: 'family helper'
-              }
-            }
-          }).result; 
-          console.log('Succeeded: ', result);
-        } catch (error) {
-          console.log('Error: ', error);
-        }
-      }
-    uploadImage();
-  }, [fileName]);
+    getSelectedFile(fileToUpload)
+  }
+
   return (
     <>
         <Header as="h4">Upload your Image</Header>

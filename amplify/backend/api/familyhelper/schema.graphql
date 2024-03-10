@@ -6,6 +6,7 @@ type List @model @auth (rules: [{allow: private}]) {
   id: ID!
   title: String!
   description: String
+  imageKey: String
   listItems: [ListItem] @hasMany(indexName: "ListListItems", fields: ["id"])
 }
 

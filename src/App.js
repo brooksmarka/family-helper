@@ -13,7 +13,6 @@ import { onCreateList, onDeleteList, onUpdateList } from "./graphql/subscription
 import MainHeader from "./components/headers/MainHeader";
 import Lists from "./components/Lists/Lists";
 import ListModal from "./components/modals/ListModal";
-import UploadImage from "./components/HandleImages/UploadImage";
 
 import { Container, Button, Icon } from "semantic-ui-react";
 import "@aws-amplify/ui-react/styles.css";
@@ -155,7 +154,6 @@ export default function App() {
               <MainHeader />
               <Lists lists={state.lists} dispatch={dispatch} />
             </div>
-            <UploadImage />
           </Container>
           <ListModal
             state={state}

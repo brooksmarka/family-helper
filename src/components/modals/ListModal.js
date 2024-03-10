@@ -1,18 +1,25 @@
-import React from "react";
+import React, { useState } from "react";
 import { Button, Modal, Form } from "semantic-ui-react";
 
 import { generateClient } from "aws-amplify/api";
 import { createList, updateList } from "../../graphql/mutations";
+import UploadImage from "../HandleImages/UploadImage";
+import { useS3 } from "../../hooks/useS3";
+
 const client = generateClient();
 
 function ListModal({ state, dispatch}) {
+  const [uploadToS3] = useS3();
+  const [fileToUpload, setfileToUpload] = useState();
 
   async function saveList() {
+    const imageKey = await uploadToS3(fileToUpload);
+    console.log("imageKey", imageKey)
     try {
       const { title, description } = state;
-      const result = await client.graphql({
+      await client.graphql({
         query: createList,
-        variables: { input: { title, description } },
+        variables: { input: { title, description, imageKey } },
       });
       dispatch({ type: "CLOSE_MODAL" });
     } catch (e) {
@@ -32,6 +39,10 @@ function ListModal({ state, dispatch}) {
     } catch (e) {
       console.log("here is the error", e);
     }
+  }
+
+  function getSelectedFile(fileName){
+    setfileToUpload(fileName)
   }
 
   return (
@@ -65,6 +76,7 @@ function ListModal({ state, dispatch}) {
               })
             }
           ></Form.TextArea>
+          <UploadImage getSelectedFile={getSelectedFile}/>
         </Form>
       </Modal.Content>
       <Modal.Actions>

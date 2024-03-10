@@ -7,6 +7,7 @@ export const getList = /* GraphQL */ `
       id
       title
       description
+      imageKey
       listItems {
         nextToken
         __typename
@@ -28,6 +29,7 @@ export const listLists = /* GraphQL */ `
         id
         title
         description
+        imageKey
         createdAt
         updatedAt
         __typename
@@ -49,6 +51,7 @@ export const getListItem = /* GraphQL */ `
         id
         title
         description
+        imageKey
         createdAt
         updatedAt
         __typename

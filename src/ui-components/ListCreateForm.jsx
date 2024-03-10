@@ -25,20 +25,24 @@ export default function ListCreateForm(props) {
   const initialValues = {
     title: "",
     description: "",
+    imageKey: "",
   };
   const [title, setTitle] = React.useState(initialValues.title);
   const [description, setDescription] = React.useState(
     initialValues.description
   );
+  const [imageKey, setImageKey] = React.useState(initialValues.imageKey);
   const [errors, setErrors] = React.useState({});
   const resetStateValues = () => {
     setTitle(initialValues.title);
     setDescription(initialValues.description);
+    setImageKey(initialValues.imageKey);
     setErrors({});
   };
   const validations = {
     title: [{ type: "Required" }],
     description: [],
+    imageKey: [],
   };
   const runValidationTasks = async (
     fieldName,
@@ -68,6 +72,7 @@ export default function ListCreateForm(props) {
         let modelFields = {
           title,
           description,
+          imageKey,
         };
         const validationResponses = await Promise.all(
           Object.keys(validations).reduce((promises, fieldName) => {
@@ -132,6 +137,7 @@ export default function ListCreateForm(props) {
             const modelFields = {
               title: value,
               description,
+              imageKey,
             };
             const result = onChange(modelFields);
             value = result?.title ?? value;
@@ -157,6 +163,7 @@ export default function ListCreateForm(props) {
             const modelFields = {
               title,
               description: value,
+              imageKey,
             };
             const result = onChange(modelFields);
             value = result?.description ?? value;
@@ -170,6 +177,32 @@ export default function ListCreateForm(props) {
         errorMessage={errors.description?.errorMessage}
         hasError={errors.description?.hasError}
         {...getOverrideProps(overrides, "description")}
+      ></TextField>
+      <TextField
+        label="Image key"
+        isRequired={false}
+        isReadOnly={false}
+        value={imageKey}
+        onChange={(e) => {
+          let { value } = e.target;
+          if (onChange) {
+            const modelFields = {
+              title,
+              description,
+              imageKey: value,
+            };
+            const result = onChange(modelFields);
+            value = result?.imageKey ?? value;
+          }
+          if (errors.imageKey?.hasError) {
+            runValidationTasks("imageKey", value);
+          }
+          setImageKey(value);
+        }}
+        onBlur={() => runValidationTasks("imageKey", imageKey)}
+        errorMessage={errors.imageKey?.errorMessage}
+        hasError={errors.imageKey?.hasError}
+        {...getOverrideProps(overrides, "imageKey")}
       ></TextField>
       <Flex
         justifyContent="space-between"
