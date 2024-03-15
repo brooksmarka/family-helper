@@ -11,6 +11,7 @@ export const createList = /* GraphQL */ `
       title
       description
       imageKey
+      slug
       listItems {
         nextToken
         __typename
@@ -31,6 +32,7 @@ export const updateList = /* GraphQL */ `
       title
       description
       imageKey
+      slug
       listItems {
         nextToken
         __typename
@@ -51,6 +53,7 @@ export const deleteList = /* GraphQL */ `
       title
       description
       imageKey
+      slug
       listItems {
         nextToken
         __typename
@@ -77,6 +80,7 @@ export const createListItem = /* GraphQL */ `
         title
         description
         imageKey
+        slug
         createdAt
         updatedAt
         __typename
@@ -107,6 +111,7 @@ export const updateListItem = /* GraphQL */ `
         title
         description
         imageKey
+        slug
         createdAt
         updatedAt
         __typename
@@ -137,6 +142,7 @@ export const deleteListItem = /* GraphQL */ `
         title
         description
         imageKey
+        slug
         createdAt
         updatedAt
         __typename

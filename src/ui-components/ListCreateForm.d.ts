@@ -25,11 +25,13 @@ export declare type ListCreateFormInputValues = {
     title?: string;
     description?: string;
     imageKey?: string;
+    slug?: string;
 };
 export declare type ListCreateFormValidationValues = {
     title?: ValidationFunction<string>;
     description?: ValidationFunction<string>;
     imageKey?: ValidationFunction<string>;
+    slug?: ValidationFunction<string>;
 };
 export declare type PrimitiveOverrideProps<T> = Partial<T> & React.DOMAttributes<HTMLDivElement>;
 export declare type ListCreateFormOverridesProps = {
@@ -37,6 +39,7 @@ export declare type ListCreateFormOverridesProps = {
     title?: PrimitiveOverrideProps<TextFieldProps>;
     description?: PrimitiveOverrideProps<TextFieldProps>;
     imageKey?: PrimitiveOverrideProps<TextFieldProps>;
+    slug?: PrimitiveOverrideProps<TextFieldProps>;
 } & EscapeHatchProps;
 export declare type ListCreateFormProps = React.PropsWithChildren<{
     overrides?: ListCreateFormOverridesProps | undefined | null;

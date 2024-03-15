@@ -1,6 +1,55 @@
 /* eslint-disable */
 // this is an auto generated file. This will be overwritten
 
+export const searchLists = /* GraphQL */ `
+  query SearchLists(
+    $filter: SearchableListFilterInput
+    $sort: [SearchableListSortInput]
+    $limit: Int
+    $nextToken: String
+    $from: Int
+    $aggregates: [SearchableListAggregationInput]
+  ) {
+    searchLists(
+      filter: $filter
+      sort: $sort
+      limit: $limit
+      nextToken: $nextToken
+      from: $from
+      aggregates: $aggregates
+    ) {
+      items {
+        id
+        title
+        description
+        imageKey
+        slug
+        createdAt
+        updatedAt
+        __typename
+      }
+      nextToken
+      total
+      aggregateItems {
+        name
+        result {
+          ... on SearchableAggregateScalarResult {
+            value
+          }
+          ... on SearchableAggregateBucketResult {
+            buckets {
+              key
+              doc_count
+              __typename
+            }
+          }
+        }
+        __typename
+      }
+      __typename
+    }
+  }
+`;
 export const getList = /* GraphQL */ `
   query GetList($id: ID!) {
     getList(id: $id) {
@@ -8,6 +57,7 @@ export const getList = /* GraphQL */ `
       title
       description
       imageKey
+      slug
       listItems {
         nextToken
         __typename
@@ -30,6 +80,7 @@ export const listLists = /* GraphQL */ `
         title
         description
         imageKey
+        slug
         createdAt
         updatedAt
         __typename
@@ -52,6 +103,7 @@ export const getListItem = /* GraphQL */ `
         title
         description
         imageKey
+        slug
         createdAt
         updatedAt
         __typename

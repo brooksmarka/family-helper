@@ -28,6 +28,9 @@ function ListModal({ state, dispatch}) {
   }
 
   async function changeList() {
+    
+    const imageKey = await uploadToS3(fileToUpload);
+    console.log("imageKey", imageKey)
     try {
       const { id, title, description } = state;
       const result = await client.graphql({

@@ -8,6 +8,7 @@ export const onCreateList = /* GraphQL */ `
       title
       description
       imageKey
+      slug
       listItems {
         nextToken
         __typename
@@ -25,6 +26,7 @@ export const onUpdateList = /* GraphQL */ `
       title
       description
       imageKey
+      slug
       listItems {
         nextToken
         __typename
@@ -42,6 +44,7 @@ export const onDeleteList = /* GraphQL */ `
       title
       description
       imageKey
+      slug
       listItems {
         nextToken
         __typename
@@ -65,6 +68,7 @@ export const onCreateListItem = /* GraphQL */ `
         title
         description
         imageKey
+        slug
         createdAt
         updatedAt
         __typename
@@ -92,6 +96,7 @@ export const onUpdateListItem = /* GraphQL */ `
         title
         description
         imageKey
+        slug
         createdAt
         updatedAt
         __typename
@@ -119,6 +124,7 @@ export const onDeleteListItem = /* GraphQL */ `
         title
         description
         imageKey
+        slug
         createdAt
         updatedAt
         __typename

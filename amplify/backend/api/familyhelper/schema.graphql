@@ -2,11 +2,12 @@
 # all models in this schema. Learn more about authorization rules here: https://docs.amplify.aws/cli/graphql/authorization-rules
 # input AMPLIFY { globalAuthRule: AuthRule = { allow: public } } # FOR TESTING ONLY!
 
-type List @model @auth (rules: [{allow: private}]) {
+type List @model @searchable @auth(rules: [{allow: private}]) {
   id: ID!
   title: String!
   description: String
   imageKey: String
+  slug: String!
   listItems: [ListItem] @hasMany(indexName: "ListListItems", fields: ["id"])
 }
 

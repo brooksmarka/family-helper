@@ -28,12 +28,14 @@ export default function ListUpdateForm(props) {
     title: "",
     description: "",
     imageKey: "",
+    slug: "",
   };
   const [title, setTitle] = React.useState(initialValues.title);
   const [description, setDescription] = React.useState(
     initialValues.description
   );
   const [imageKey, setImageKey] = React.useState(initialValues.imageKey);
+  const [slug, setSlug] = React.useState(initialValues.slug);
   const [errors, setErrors] = React.useState({});
   const resetStateValues = () => {
     const cleanValues = listRecord
@@ -42,6 +44,7 @@ export default function ListUpdateForm(props) {
     setTitle(cleanValues.title);
     setDescription(cleanValues.description);
     setImageKey(cleanValues.imageKey);
+    setSlug(cleanValues.slug);
     setErrors({});
   };
   const [listRecord, setListRecord] = React.useState(listModelProp);
@@ -64,6 +67,7 @@ export default function ListUpdateForm(props) {
     title: [{ type: "Required" }],
     description: [],
     imageKey: [],
+    slug: [{ type: "Required" }],
   };
   const runValidationTasks = async (
     fieldName,
@@ -94,6 +98,7 @@ export default function ListUpdateForm(props) {
           title,
           description: description ?? null,
           imageKey: imageKey ?? null,
+          slug,
         };
         const validationResponses = await Promise.all(
           Object.keys(validations).reduce((promises, fieldName) => {
@@ -157,6 +162,7 @@ export default function ListUpdateForm(props) {
               title: value,
               description,
               imageKey,
+              slug,
             };
             const result = onChange(modelFields);
             value = result?.title ?? value;
@@ -183,6 +189,7 @@ export default function ListUpdateForm(props) {
               title,
               description: value,
               imageKey,
+              slug,
             };
             const result = onChange(modelFields);
             value = result?.description ?? value;
@@ -209,6 +216,7 @@ export default function ListUpdateForm(props) {
               title,
               description,
               imageKey: value,
+              slug,
             };
             const result = onChange(modelFields);
             value = result?.imageKey ?? value;
@@ -222,6 +230,33 @@ export default function ListUpdateForm(props) {
         errorMessage={errors.imageKey?.errorMessage}
         hasError={errors.imageKey?.hasError}
         {...getOverrideProps(overrides, "imageKey")}
+      ></TextField>
+      <TextField
+        label="Slug"
+        isRequired={true}
+        isReadOnly={false}
+        value={slug}
+        onChange={(e) => {
+          let { value } = e.target;
+          if (onChange) {
+            const modelFields = {
+              title,
+              description,
+              imageKey,
+              slug: value,
+            };
+            const result = onChange(modelFields);
+            value = result?.slug ?? value;
+          }
+          if (errors.slug?.hasError) {
+            runValidationTasks("slug", value);
+          }
+          setSlug(value);
+        }}
+        onBlur={() => runValidationTasks("slug", slug)}
+        errorMessage={errors.slug?.errorMessage}
+        hasError={errors.slug?.hasError}
+        {...getOverrideProps(overrides, "slug")}
       ></TextField>
       <Flex
         justifyContent="space-between"
