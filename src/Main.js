@@ -1,5 +1,6 @@
 import "./App.css";
 import { useEffect, useReducer } from "react";
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
 
 import awsConfig from "./aws-exports";
 import { Amplify, } from "aws-amplify";
@@ -17,6 +18,7 @@ import ListModal from "./components/modals/ListModal";
 import { Container, Button, Icon } from "semantic-ui-react";
 import "@aws-amplify/ui-react/styles.css";
 import "semantic-ui-css/semantic.min.css";
+import ListContainer from "./ListContainer";
 
 Amplify.configure(awsConfig);
 
@@ -152,7 +154,15 @@ export default function Main() {
                 Sign out
               </button>
               <MainHeader />
-              <Lists lists={state.lists} dispatch={dispatch} />
+              <BrowserRouter>
+                <Routes>
+                  <Route path='/' element={<Lists lists={state.lists} dispatch={dispatch} />} />
+                  <Route 
+                    path='/list/:slug' 
+                    element={<ListContainer lists={state.lists} />}
+                  /> 
+                </Routes>
+              </BrowserRouter>
             </div>
           </Container>
           <ListModal
