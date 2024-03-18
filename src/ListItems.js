@@ -8,10 +8,6 @@ const client = generateClient();
 
 function ListItems(props) {
     const { slug } = useParams();
-    console.log("slug", slug)
-    console.log("props", props)
-    console.log("title", props.listData?.title)
-
     const [items, setItems] = useState([]);
 
     async function fetchItems(){
@@ -23,9 +19,7 @@ function ListItems(props) {
                 }
             }
         })
-        console.log("data from listActions", data)
         if(data !== null){
-            console.log("here is value adding to array", data.searchLists.items[0].listItems.items )
             setItems(data.searchLists.items[0].listItems.items)
         }
     }

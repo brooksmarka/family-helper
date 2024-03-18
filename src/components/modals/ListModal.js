@@ -12,35 +12,43 @@ function ListModal({ state, dispatch}) {
   const [uploadToS3] = useS3();
   const [fileToUpload, setfileToUpload] = useState();
 
+  function generateSlug(title){
+    return title.replace(/ /g, "_").toLowerCase();
+  }
+
   async function saveList() {
     const imageKey = await uploadToS3(fileToUpload);
-    console.log("imageKey", imageKey)
+   
     try {
       const { title, description } = state;
+      const slug = generateSlug(title);
+    
+      if (!title || !description || !imageKey) {
+        console.error("Missing required fields", { title, description, imageKey, slug });
+        return; 
+      }
       await client.graphql({
         query: createList,
-        variables: { input: { title, description, imageKey } },
+        variables: { input: { title, description, imageKey, slug } },
       });
       dispatch({ type: "CLOSE_MODAL" });
     } catch (e) {
-      console.log("here is the error", e);
+      console.log("error in SaveList", e);
     }
   }
 
   async function changeList() {
     
     const imageKey = await uploadToS3(fileToUpload);
-    console.log("imageKey", imageKey)
     try {
       const { id, title, description } = state;
       const result = await client.graphql({
         query: updateList,
-        variables: { input: {id, title, description } },
+        variables: { input: {id, title, description, imageKey} },
       });
       dispatch({ type: "CLOSE_MODAL" });
-      console.log("Edit data with result", result)
     } catch (e) {
-      console.log("here is the error", e);
+      console.log("error in changeList", e);
     }
   }
 

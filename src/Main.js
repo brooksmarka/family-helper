@@ -60,7 +60,6 @@ function listReducer(state = initialState, action) {
       newList[index] = action.value;
       return {...state, lists: newList };
     case "EDIT_LIST":
-      console.log("here is action", action);
       const newValue = { ...action.value };
       delete newValue.children;
       delete newValue.dispatch;
@@ -78,7 +77,6 @@ function listReducer(state = initialState, action) {
     case "CLOSE_MODAL":
       return { ...state, isModalOpen: false, title: "", description: "", id: "" };
     default:
-      console.log("Default action for: ", action);
       return state;
   }
 }
@@ -98,7 +96,6 @@ export default function Main() {
   async function fetchList() {
     try {
       const { data } = await client.graphql({ query: listLists });
-      console.log({ data });
       dispatch({ type: "UPDATE_LISTS", value: data.listLists.items });
     } catch (error) {
       console.error("Error fetching list:", error);
@@ -112,14 +109,12 @@ export default function Main() {
   useEffect(() => {
     const createListSub = client.graphql({ query: onCreateList }).subscribe({
       next: ({ data }) => {
-        console.log("onCreateList called", data);
         dispatch({ type: "UPDATE_LISTS", value: [data.onCreateList] });
       },
       error: (error) => console.log(error),
     });
     const updateListSub = client.graphql({ query: onUpdateList }).subscribe({
       next: ({data}) => {
-        console.log("onUpdateeList called", data);
         dispatch({ type: "UPDATE_LIST_RESULT",
         value: data.onUpdateList });
       }

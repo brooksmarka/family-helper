@@ -23,7 +23,6 @@ export function useS3() {
         } catch (error) {
             console.log('Error: ', error);
         }
-        console.log("save to s3", key)
     return key;
     }
 return [saveToS3]
